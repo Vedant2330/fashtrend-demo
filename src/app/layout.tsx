@@ -2,8 +2,9 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://fashtrend-demo.vercel.app'),
   title: 'Fashtrend • Print it. Wear it. Flaunt it.',
-  description: 'Custom oversized tees, kids\' fits & festival specials. Made in Pune, PAN India delivery. DM to order.',
+  description: "Custom oversized tees, kids' fits & festival specials. Made in Pune, PAN India delivery. DM to order.",
   keywords: ['custom tees', 'oversized tees', 'custom clothing', 'Pune fashion', 'print on demand'],
   authors: [{ name: 'Fashtrend' }],
   creator: 'Fashtrend',
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
     locale: 'en_IN',
     url: 'https://fashtrend-demo.vercel.app',
     title: 'Fashtrend • Print it. Wear it. Flaunt it.',
-    description: 'Custom oversized tees, kids\' fits & festival specials. Made in Pune, PAN India delivery.',
+    description: "Custom oversized tees, kids' fits & festival specials. Made in Pune, PAN India delivery.",
     siteName: 'Fashtrend',
     images: [
       {
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Fashtrend • Print it. Wear it. Flaunt it.',
-    description: 'Custom oversized tees, kids\' fits & festival specials. Made in Pune, PAN India delivery.',
+    description: "Custom oversized tees, kids' fits & festival specials. Made in Pune, PAN India delivery.",
     images: ['/images/og-image.jpg'],
   },
   icons: {
@@ -40,7 +41,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#1C1E21',
+  themeColor: '#FAFAF5',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -57,7 +58,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
-      <body className="min-h-screen bg-charcoal text-cream antialiased">
+      <body className="min-h-screen bg-background text-text-primary antialiased">
         {children}
       </body>
     </html>

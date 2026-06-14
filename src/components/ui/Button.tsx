@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils'
 import { forwardRef, ButtonHTMLAttributes } from 'react'
+import { Slot } from '@radix-ui/react-slot'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'whatsapp'
@@ -10,9 +11,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: React.ReactNode
   iconPosition?: 'left' | 'right'
   fullWidth?: boolean
+  asChild?: boolean
 }
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+const ButtonComponent = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       children,
@@ -24,6 +26,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       fullWidth = false,
       className,
       disabled,
+      asChild = false,
       ...props
     },
     ref
@@ -31,28 +34,27 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const baseStyles = `
       inline-flex items-center justify-center gap-2 font-semibold rounded-xl
       transition-all duration-200 ease-out
-      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-electric-blue focus-visible:ring-offset-2 focus-visible:ring-offset-charcoal
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background
       disabled:opacity-50 disabled:cursor-not-allowed
       select-none
     `
 
     const variantStyles = {
       primary: `
-        bg-electric-blue text-charcoal hover:bg-electric-blue/90 active:bg-electric-blue/100
-        shadow-lg shadow-electric-blue/25 hover:shadow-electric-blue/40
+        bg-accent text-background hover:bg-accent-hover active:bg-accent-hover/80
+        shadow-lg shadow-accent/25 hover:shadow-accent/40
       `,
       secondary: `
-        bg-gray-700 text-cream hover:bg-gray-600 active:bg-gray-600
-        border border-gray-600
+        bg-background text-text-primary border border-border hover:border-accent hover:bg-accent-light
       `,
       outline: `
-        border-2 border-electric-blue text-electric-blue hover:bg-electric-blue/10
+        border-2 border-accent text-accent hover:bg-accent-light hover:text-accent-hover
       `,
       ghost: `
-        text-cream hover:bg-white/5
+        text-text-secondary hover:bg-accent-light
       `,
       whatsapp: `
-        bg-[#25D366] text-charcoal hover:bg-[#25D366]/90 active:bg-[#25D366]/100
+        bg-[#25D366] text-background hover:bg-[#25D366]/90 active:bg-[#25D366]/80
         shadow-lg shadow-[#25D366]/25 hover:shadow-[#25D366]/40
       `,
     }
@@ -64,16 +66,20 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       xl: 'px-10 py-5 text-xl gap-3',
     }
 
+    const computedClassName = cn(
+      baseStyles,
+      variantStyles[variant],
+      sizeStyles[size],
+      fullWidth && 'w-full',
+      className
+    )
+
+    const Comp = asChild ? Slot : 'button'
+
     return (
-      <button
+      <Comp
         ref={ref}
-        className={cn(
-          baseStyles,
-          variantStyles[variant],
-          sizeStyles[size],
-          fullWidth && 'w-full',
-          className
-        )}
+        className={computedClassName}
         disabled={disabled || loading}
         {...props}
       >
@@ -108,9 +114,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             {icon && iconPosition === 'right' && <span className="flex-shrink-0">{icon}</span>}
           </>
         )}
-      </button>
+      </Comp>
     )
   }
 )
 
-Button.displayName = 'Button'
+export const Button = ButtonComponent
+ButtonComponent.displayName = 'Button'

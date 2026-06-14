@@ -21,7 +21,7 @@ export function KineticTypography({
   className,
   triggerRef,
   stagger = 0.08,
-  delay = 0.2,
+  delay = 0.1,
   onComplete,
 }: KineticTypographyProps) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -67,6 +67,12 @@ export function KineticTypography({
       className={cn('flex flex-col gap-1 text-center', className)}
       role="heading"
       aria-level={1}
+      style={{ 
+        lineHeight: 0.9,
+        fontWeight: 800,
+        fontSize: 'clamp(72px, 8vw, 120px)',
+        letterSpacing: '-0.03em'
+      }}
     >
       {words.map((word, index) => (
         <span

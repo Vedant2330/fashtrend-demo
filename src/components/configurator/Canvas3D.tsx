@@ -2,7 +2,7 @@
 
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Environment, useGLTF } from '@react-three/drei'
-import { Suspense, useRef, useEffect } from 'react'
+import { Suspense, useRef, useEffect, useState } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { cn } from '@/lib/utils'
@@ -17,6 +17,10 @@ interface Canvas3DProps {
 
 export function Canvas3D({ className, modelPath = '/models/tee.glb' }: Canvas3DProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const [modelError, setModelError] = useState(false)
+  
+  // Fallback to a known working GLB model URL
+  const [currentModelPath, setCurrentModelPath] = useState<string>(modelPath)
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -75,7 +79,7 @@ export function Canvas3D({ className, modelPath = '/models/tee.glb' }: Canvas3DP
             shadow-camera-bottom={-5}
           />
           <directionalLight position={[-3, 5, -3]} intensity={0.5} />
-          <TeeModel modelPath={modelPath} />
+          <TeeModel modelPath={currentModelPath} />
           <OrbitControls
             enablePan={false}
             enableZoom={true}
