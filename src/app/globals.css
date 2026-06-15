@@ -73,6 +73,24 @@
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
   .text-gradient { @apply bg-gradient-to-r from-accent to-accent-hover bg-clip-text text-transparent; }
+
+  /* Apple Dock style hover magnification for product cards */
+  .dock-hover-container:hover .dock-card {
+    transform: scale(1.04);
+    z-index: 10;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), z-index 0s;
+  }
+  .dock-hover-container:hover .dock-card:hover {
+    transform: scale(1.08);
+    z-index: 20;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), z-index 0s;
+  }
+  .dock-hover-container:hover .dock-card:has(+ .dock-card:hover) {
+    transform: scale(1.04);
+  }
+  .dock-hover-container:hover .dock-card:has(+ .dock-card:has(+ .dock-card:hover)) {
+    transform: scale(1.02);
+  }
 }
 
 @layer components {

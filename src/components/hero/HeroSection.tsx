@@ -1,6 +1,5 @@
 'use client'
 
-import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
 
 interface HeroSectionProps {
@@ -38,13 +37,13 @@ export function HeroSection({ className }: HeroSectionProps) {
       {/* Scroll Progress Bar */}
       <div className="fixed top-0 left-0 z-50 h-[3px] w-full origin-left transform scale-x-0 bg-gradient-to-r from-accent to-accent-hover scroll-progress" id="scroll-progress" />
 
-      {/* Content Wrapper - Absolutely Centered at 55% Viewport Height */}
+      {/* Content Wrapper - Absolutely Centered at 65% Viewport Height */}
       <div 
         className="relative z-10"
         style={{
           position: 'absolute',
           left: '50%',
-          top: '55%',
+          top: '65%',
           transform: 'translate(-50%, -50%)',
           width: '100%',
           maxWidth: '800px',
@@ -56,10 +55,10 @@ export function HeroSection({ className }: HeroSectionProps) {
           textAlign: 'center',
         }}
       >
-        
+       
         {/* TOP SECTION */}
         <div className=" mb-16" id="top-section">
-          
+         
           {/* Eyebrow Text */}
           <div className="mb-6">
             <span className="inline-flex items-center gap-2 text-xs font-medium tracking-widest uppercase text-accent font-mono opacity-70">
@@ -91,15 +90,15 @@ export function HeroSection({ className }: HeroSectionProps) {
           id="protected-zone"
           aria-hidden="true"
           style={{ 
-            minHeight: 260,
-            maxHeight: 300,
+            minHeight: 280,
+            maxHeight: 320,
             flexShrink: 0
           }}
         />
 
         {/* BOTTOM SECTION */}
         <div className="mt-16 flex flex-col items-center text-center w-full max-w-xl" id="bottom-section">
-          
+         
           {/* Trust Indicators - Single Row, Centered */}
           <div className="flex flex-wrap justify-center gap-3 mb-10" role="list" aria-label="Trust indicators">
             <span className="badge text-xs px-4 py-2" role="listitem">
@@ -135,27 +134,6 @@ export function HeroSection({ className }: HeroSectionProps) {
           </div>
         </div>
       </div>
-
-      {/* Single Full-Width Video Background */}
-      <div className="absolute inset-0 z-0" aria-hidden="true">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-          aria-hidden="true"
-        >
-          <source src="/videos/hero-desktop.webm" type="video/webm" />
-          <source src="/videos/hero-mobile.webm" type="video/webm" />
-        </video>
-
-        {/* Subtle gradient overlay for text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/10 to-transparent" />
-      </div>
-
-      {/* Scroll Progress Bar */}
-      <div className="fixed top-0 left-0 z-50 h-[3px] w-full origin-left transform scale-x-0 bg-gradient-to-r from-accent to-accent-hover scroll-progress" id="scroll-progress" />
     </section>
   )
 }

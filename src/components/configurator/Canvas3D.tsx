@@ -29,8 +29,8 @@ export function Canvas3D({ className, modelPath = '/models/tee.glb' }: Canvas3DP
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: '#configurator',
-          start: 'top 80%',
-          end: 'top 40%',
+          start: 'top 85%',
+          end: 'top 50%',
           scrub: 1,
           onEnter: () => ScrollTrigger.refresh(),
         },
@@ -38,7 +38,7 @@ export function Canvas3D({ className, modelPath = '/models/tee.glb' }: Canvas3DP
 
       tl.fromTo(
         containerRef.current!,
-        { opacity: 0, rotationY: -180, scale: 0.8 },
+        { opacity: 0, rotationY: -120, scale: 0.9 },
         { opacity: 1, rotationY: 0, scale: 1, duration: 1, ease: 'expo.out' }
       )
     })

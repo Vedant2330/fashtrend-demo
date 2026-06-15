@@ -35,10 +35,10 @@ export function UGCItem({ item, index, onOpenModal }: UGCItemProps) {
   return (
     <motion.div
       ref={containerRef}
-      initial={{ opacity: 0, scale: 0.95, y: 20 }}
+      initial={{ opacity: 0, scale: 0.97, y: 15 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ delay: index * 0.06, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-      whileHover={{ scale: 1.02, y: -4, transition: { duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] } }}
+      transition={{ delay: index * 0.05, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+      whileHover={{ scale: 1.015, y: -2, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] } }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleClick}
@@ -63,8 +63,8 @@ export function UGCItem({ item, index, onOpenModal }: UGCItemProps) {
           alt={item.caption}
           className="w-full h-full object-cover transition-transform duration-700 ease-out"
           style={{
-            transform: isHovered ? 'scale(1.08)' : 'scale(1)',
-            filter: isHovered && !item.isVideo ? 'brightness(0.9)' : 'none',
+            transform: isHovered ? 'scale(1.03)' : 'scale(1)',
+            filter: isHovered && !item.isVideo ? 'brightness(0.95)' : 'none',
           }}
           onLoad={() => setImageLoaded(true)}
         />
@@ -77,20 +77,16 @@ export function UGCItem({ item, index, onOpenModal }: UGCItemProps) {
         {/* Video Play Indicator */}
         {item.isVideo && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm"
             transition={{ duration: 0.3 }}
           >
-            <motion.div
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-              className="w-16 h-16 rounded-full bg-accent/90 flex items-center justify-center shadow-2xl"
-            >
+            <div className="w-16 h-16 rounded-full bg-accent/90 flex items-center justify-center shadow-2xl">
               <svg className="w-8 h-8 text-background ml-1" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M8 5v14l11-7z" />
               </svg>
-            </motion.div>
+            </div>
           </motion.div>
         )}
 
@@ -103,7 +99,7 @@ export function UGCItem({ item, index, onOpenModal }: UGCItemProps) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end p-4"
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.25 }}
               >
                 <div className="text-white">
                   <p className="font-medium text-sm line-clamp-2">{item.caption}</p>
@@ -133,11 +129,11 @@ export function UGCItem({ item, index, onOpenModal }: UGCItemProps) {
         <AnimatePresence>
           {isHovered && item.tags.length > 0 && (
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
+              exit={{ opacity: 0, y: 8 }}
               className="absolute bottom-3 left-3 flex flex-wrap gap-1.5 z-10"
-              transition={{ delay: 0.1 }}
+              transition={{ delay: 0.05 }}
             >
               {item.tags.slice(0, 4).map((tag) => (
                 <span key={tag} className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/90 backdrop-blur-sm text-text-primary">

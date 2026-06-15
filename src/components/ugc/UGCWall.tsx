@@ -54,22 +54,22 @@ export function UGCWall({ className }: UGCWallProps) {
     const ctx = gsap.context(() => {
       if (!wallRef.current) return
 
-      // Stagger fade-up + scale animation for masonry items
+      // Stagger fade-up + scale animation for masonry items - reduced intensity
       const items = wallRef.current.querySelectorAll('[data-ugc-item]')
       if (items.length > 0) {
         gsap.fromTo(items,
-          { opacity: 0, scale: 0.95, y: 30 },
+          { opacity: 0, scale: 0.97, y: 20 },
           {
             opacity: 1,
             scale: 1,
             y: 0,
-            duration: 0.6,
-            stagger: { amount: 0.6, from: 'start' },
+            duration: 0.7,
+            stagger: { amount: 0.8, from: 'start' },
             ease: 'power2.out',
             scrollTrigger: {
               trigger: wallRef.current,
-              start: 'top 80%',
-              end: 'top 40%',
+              start: 'top 85%',
+              end: 'top 45%',
               toggleActions: 'play none none reverse',
             }
           }
@@ -98,19 +98,19 @@ export function UGCWall({ className }: UGCWallProps) {
       <section
         ref={wallRef}
         id="gallery"
-        className={cn('py-20 lg:py-28 px-6', className)}
+        className={cn('py-24 lg:py-36 px-6', className)}
         aria-labelledby="ugc-heading"
       >
         <div className="max-w-7xl mx-auto">
           {/* Section Header */}
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <h2 id="ugc-heading" className="text-4xl lg:text-5xl font-extrabold text-text-primary mb-4">
+          <div className="text-center max-w-3xl mx-auto mb-16 lg:mb-20">
+            <h2 id="ugc-heading" className="text-4xl lg:text-5xl font-extrabold text-text-primary mb-5">
               Community <span className="text-accent">Showcase</span>
             </h2>
-            <p className="text-lg text-text-secondary max-w-2xl mx-auto mb-8">
+            <p className="text-lg text-text-secondary max-w-2xl mx-auto mb-10 leading-relaxed">
               Real customers, real stories. See how our community styles their Fashtrend tees.
             </p>
-            
+           
             {/* CTA Row */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button variant="outline" size="md" onClick={() => window.open('https://instagram.com/fash__trend', '_blank')}>
@@ -124,7 +124,7 @@ export function UGCWall({ className }: UGCWallProps) {
           {/* Masonry Grid */}
           <div
             className={cn(
-              'grid gap-4 lg:gap-6',
+              'grid gap-6 lg:gap-8',
               'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
             )}
             role="list"
@@ -138,7 +138,7 @@ export function UGCWall({ className }: UGCWallProps) {
           </div>
 
           {/* View More CTA */}
-          <div className="text-center mt-12">
+          <div className="text-center mt-16 lg:mt-20">
             <a
               href="https://instagram.com/fash__trend"
               target="_blank"

@@ -14,52 +14,92 @@ gsap.registerPlugin(ScrollTrigger)
 export function ProductCarousel() {
   const [activeTab, setActiveTab] = useState<CarouselTabId>(CAROUSEL_TABS[0].id)
   const [isAnimating, setIsAnimating] = useState(false)
+  const [isHovering, setIsHovering] = useState(false)
   const carouselRef = useRef<HTMLDivElement>(null)
   const cardsContainerRef = useRef<HTMLDivElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null)
   const gsapContextRef = useRef<gsap.Context | null>(null)
+  const animationFrameRef = useRef<number>(null)
+  const scrollPositionRef = useRef(0)
+  const directionRef = useRef(1) // 1 for forward, -1 for reverse
 
   const currentProducts = CAROUSEL_PRODUCTS[activeTab] || []
 
-  // Handle tab change with cube rotation animation
+  // Create infinite loop data (duplicate products)
+  const infiniteProducts = [...currentProducts, ...currentProducts, ...currentProducts]
+
+  // Handle tab change with smooth fade
   const handleTabChange = useCallback((tabId: CarouselTabId) => {
     if (tabId === activeTab || isAnimating) return
     
     setIsAnimating(true)
     
-    // Animate out current cards
-    const currentCards = cardsContainerRef.current?.querySelectorAll('[data-card-id]')
-    if (currentCards) {
-      gsap.to(currentCards, {
-        opacity: 0,
-        y: 30,
-        scale: 0.9,
-        rotationY: 45,
-        duration: 0.4,
-        stagger: 0.03,
-        ease: 'power2.in',
-        onComplete: () => {
-          setActiveTab(tabId)
-          // Animate in new cards
-          setTimeout(() => {
-            const newCards = cardsContainerRef.current?.querySelectorAll('[data-card-id]')
-            if (newCards) {
-              gsap.fromTo(newCards,
-                { opacity: 0, y: 30, scale: 0.9, rotationY: -45 },
-                { opacity: 1, y: 0, scale: 1, rotationY: 0, duration: 0.5, stagger: 0.05, ease: 'power2.out', onComplete: () => setIsAnimating(false) }
-              )
-            }
-          }, 50)
-        }
-      })
-    } else {
-      setActiveTab(tabId)
-      setIsAnimating(false)
-    }
+    // Fade out
+    gsap.to(cardsContainerRef.current, {
+      opacity: 0,
+      y: 20,
+      duration: 0.3,
+      ease: 'power2.in',
+      onComplete: () => {
+        setActiveTab(tabId)
+        // Fade in
+        gsap.fromTo(cardsContainerRef.current,
+          { opacity: 0, y: -20 },
+          { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out', onComplete: () => setIsAnimating(false) }
+        )
+      }
+    })
   }, [activeTab, isAnimating])
 
-  // Scroll animation setup
+  // Auto-scroll animation
+  useEffect(() => {
+    const container = scrollContainerRef.current
+    if (!container) return
+
+    let lastTime = performance.now()
+    const baseSpeed = 0.35 // pixels per ms - very slow, cinematic
+
+    const animate = (currentTime: number) => {
+      if (!isHovering && container) {
+        const deltaTime = currentTime - lastTime
+        const scrollDistance = baseSpeed * deltaTime * directionRef.current
+        
+        scrollPositionRef.current += scrollDistance
+        
+        // Handle infinite loop - when we've scrolled one full set, reset seamlessly
+        const singleSetWidth = container.scrollWidth / 3
+        if (scrollPositionRef.current >= singleSetWidth) {
+          scrollPositionRef.current -= singleSetWidth
+        } else if (scrollPositionRef.current <= 0) {
+          scrollPositionRef.current += singleSetWidth
+        }
+        
+        container.scrollLeft = scrollPositionRef.current
+      }
+      lastTime = currentTime
+      animationFrameRef.current = requestAnimationFrame(animate)
+    }
+
+    // Start from middle of the triplicated content for seamless looping
+    const initScroll = () => {
+      const singleSetWidth = container.scrollWidth / 3
+      scrollPositionRef.current = singleSetWidth
+      container.scrollLeft = scrollPositionRef.current
+    }
+
+    // Wait for layout
+    setTimeout(initScroll, 100)
+    animationFrameRef.current = requestAnimationFrame(animate)
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
+    }
+  }, [isHovering, activeTab, infiniteProducts.length])
+
+  // Scroll animation setup (entrance)
   useEffect(() => {
     const ctx = gsap.context(() => {
       if (!carouselRef.current) return
@@ -68,34 +108,22 @@ export function ProductCarousel() {
       const cards = cardsContainerRef.current?.querySelectorAll('[data-card-id]')
       if (cards && cards.length > 0) {
         gsap.fromTo(cards,
-          { opacity: 0, y: 40, scale: 0.9 },
+          { opacity: 0, y: 25, scale: 0.97 },
           {
             opacity: 1,
             y: 0,
             scale: 1,
-            duration: 0.6,
-            stagger: 0.08,
+            duration: 0.5,
+            stagger: 0.05,
             ease: 'power2.out',
             scrollTrigger: {
               trigger: carouselRef.current,
-              start: 'top 80%',
-              end: 'top 40%',
+              start: 'top 85%',
+              end: 'top 45%',
               toggleActions: 'play none none reverse',
             }
           }
         )
-      }
-
-      // Horizontal scroll progress animation
-      if (scrollContainerRef.current) {
-        scrollTriggerRef.current = ScrollTrigger.create({
-          trigger: carouselRef.current,
-          start: 'top bottom',
-          end: 'bottom top',
-          onUpdate: (self) => {
-            // Could add parallax or other scroll effects here
-          }
-        })
       }
     })
 
@@ -105,14 +133,14 @@ export function ProductCarousel() {
       ctx.revert()
       scrollTriggerRef.current?.kill()
     }
-  }, [])
+  }, [activeTab])
 
-  // Keyboard navigation for horizontal scroll
+  // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!scrollContainerRef.current) return
     
     const container = scrollContainerRef.current
-    const scrollAmount = 360 // Approximate card width + gap
+    const scrollAmount = 360
     
     if (e.key === 'ArrowLeft') {
       e.preventDefault()
@@ -127,17 +155,19 @@ export function ProductCarousel() {
     <section
       ref={carouselRef}
       id="products"
-      className="py-20 lg:py-28 px-6"
+      className="py-24 lg:py-32 px-6"
       aria-labelledby="carousel-heading"
       onKeyDown={handleKeyDown}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
     >
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <h2 id="carousel-heading" className="text-4xl lg:text-5xl font-extrabold text-text-primary mb-4">
+        <div className="text-center max-w-3xl mx-auto mb-16 lg:mb-20">
+          <h2 id="carousel-heading" className="text-4xl lg:text-5xl font-extrabold text-text-primary mb-5">
             Shop <span className="text-accent">Collection</span>
           </h2>
-          <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+          <p className="text-lg text-text-secondary max-w-2xl mx-auto leading-relaxed">
             Discover our curated selection of premium oversized tees, custom designs, kids' fits, and festival specials. Each piece crafted with attention to detail in Pune.
           </p>
         </div>
@@ -146,32 +176,33 @@ export function ProductCarousel() {
         <CarouselTabs
           activeTab={activeTab}
           onTabChange={handleTabChange}
-          className="mb-8 justify-center"
+          className="mb-12 lg:mb-16 justify-center"
         />
 
         {/* Carousel Container */}
         <div className="relative">
-          {/* Scroll Gradient Overlays */}
-          <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-background to-transparent pointer-events-none z-10" aria-hidden="true" />
-          <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-background to-transparent pointer-events-none z-10" aria-hidden="true" />
-
-          {/* Horizontal Scroll Container */}
+          {/* Horizontal Scroll Container - Infinite Rail */}
           <div
             ref={scrollContainerRef}
-            className="flex gap-6 lg:gap-8 pb-6 overflow-x-auto scrollbar-hide scroll-smooth"
+            className="flex gap-8 lg:gap-10 pb-8 dock-hover-container"
             role="region"
             aria-label="Product carousel"
             tabIndex={0}
             style={{
               scrollSnapType: 'x mandatory',
               WebkitOverflowScrolling: 'touch',
+              cursor: isHovering ? 'grab' : 'default',
             }}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+            onTouchStart={() => setIsHovering(true)}
+            onTouchEnd={() => setIsHovering(false)}
           >
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTab}
                 ref={cardsContainerRef}
-                className="flex gap-6 lg:gap-8 min-w-max"
+                className="flex gap-8 lg:gap-10 min-w-max"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -180,34 +211,22 @@ export function ProductCarousel() {
                 id={`${activeTab}-panel`}
                 aria-labelledby={`${activeTab}-trigger`}
               >
-                {currentProducts.map((product, index) => (
-                  <div key={product.id} className="flex-shrink-0 snap-start" style={{ width: '340px' }}>
-                    <ProductCard product={product} index={index} />
+                {infiniteProducts.map((product, index) => (
+                  <div key={`${product.id}-${Math.floor(index / currentProducts.length)}`} className="flex-shrink-0 snap-start" style={{ width: '320px' }}>
+                    <ProductCard product={product} index={index % currentProducts.length} />
                   </div>
                 ))}
               </motion.div>
             </AnimatePresence>
           </div>
 
-          {/* Scroll Indicator */}
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-center gap-2 text-text-muted text-xs opacity-60 hidden lg:flex">
-            <motion.svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              animate={{ x: [0, 8, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-              aria-hidden="true"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </motion.svg>
-            <span>Scroll to explore</span>
-          </div>
+          {/* Gradient Fade Overlays */}
+          <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background to-transparent pointer-events-none z-10" aria-hidden="true" />
+          <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background to-transparent pointer-events-none z-10" aria-hidden="true" />
         </div>
 
         {/* View All CTA */}
-        <div className="text-center mt-12">
+        <div className="text-center mt-16">
           <a
             href="#gallery"
             className="inline-flex items-center gap-2 text-accent font-medium hover:text-accent-hover transition-colors"

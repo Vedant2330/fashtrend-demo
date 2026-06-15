@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { cn, formatPrice } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import type { CarouselProduct } from '@/lib/constants'
+import Link from 'next/link'
 
-// WhatsApp icon component - using a simpler path
+// WhatsApp icon component
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -21,27 +22,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, index }: ProductCardProps) {
-  const [isFlipped, setIsFlipped] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
-  const [hovered, setHovered] = useState(false)
-
-  // Auto-flip on hover for desktop
-  useEffect(() => {
-    const handleMouseEnter = () => setIsFlipped(true)
-    const handleMouseLeave = () => setIsFlipped(false)
-    
-    const card = document.querySelector(`[data-card-id="${product.id}"]`)
-    if (card) {
-      card.addEventListener('mouseenter', handleMouseEnter)
-      card.addEventListener('mouseleave', handleMouseLeave)
-    }
-    return () => {
-      if (card) {
-        card.removeEventListener('mouseenter', handleMouseEnter)
-        card.removeEventListener('mouseleave', handleMouseLeave)
-      }
-    }
-  }, [product.id])
 
   const handleWhatsAppOrder = () => {
     const msg = encodeURIComponent(
@@ -57,145 +38,62 @@ export function ProductCard({ product, index }: ProductCardProps) {
 
   return (
     <motion.div
-      ref={(el) => { if (el) el.setAttribute('data-card-id', product.id) }}
       initial={{ opacity: 0, y: 30, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ delay: index * 0.08, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-      whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] } }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className="relative"
+      transition={{ delay: index * 0.06, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+      className="relative group dock-card"
       style={{ perspective: 1000 }}
     >
-      <div
-        className={cn(
-          'relative w-full aspect-square rounded-2xl overflow-hidden',
-          'bg-background border border-border',
-          'shadow-lg shadow-accent/5 hover:shadow-xl hover:shadow-accent/10',
-          'transition-all duration-500 ease-out',
-        )}
-        style={{
-          transformStyle: 'preserve-3d',
-          transition: 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-          transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-        }}
-        onMouseEnter={() => setIsFlipped(true)}
-        onMouseLeave={() => setIsFlipped(false)}
-        onTouchStart={() => setIsFlipped(!isFlipped)}
-      >
-        {/* Front Face */}
-        <div
-          className="absolute inset-0 backface-hidden w-full h-full"
-          style={{
-            backfaceVisibility: 'hidden',
-            transform: 'rotateY(0deg)',
-          }}
-        >
-          {/* Product Image */}
-          <div className="relative w-full h-[70%] overflow-hidden">
-            <motion.img
-              src={product.image}
-              alt={product.title}
-              className="w-full h-full object-cover transition-transform duration-500"
-              style={{ transform: hovered ? 'scale(1.05)' : 'scale(1)' }}
-              onLoad={() => setImageLoaded(true)}
-            />
-            {!imageLoaded && (
-              <div className="absolute inset-0 bg-background-alt flex items-center justify-center">
-                <div className="animate-pulse text-text-muted">Loading...</div>
-              </div>
-            )}
-            
-            {/* Badge */}
-            {product.badge && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-semibold"
-                style={{
-                  background: 'var(--color-accent)',
-                  color: 'var(--color-background)',
-                }}
-              >
-                {product.badge}
-              </motion.div>
-            )}
-
-            {/* Discount Badge */}
-            {product.originalPrice && product.originalPrice > product.price && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-semibold bg-error text-background"
-              >
-                {Math.round((1 - product.price / product.originalPrice!) * 100)}% OFF
-              </motion.div>
-            )}
-          </div>
-
-          {/* Product Info */}
-          <div className="p-4 space-y-2">
-            <p className="text-xs font-medium text-text-muted uppercase tracking-wider">
-              {product.category}
-            </p>
-            <h3 className="font-semibold text-text-primary text-lg line-clamp-1">
-              {product.title}
-            </h3>
-            <div className="flex items-center gap-2">
-              <span className="text-xl font-bold text-text-primary">
-                {formatPrice(product.price)}
-              </span>
-              {product.originalPrice && product.originalPrice > product.price && (
-                <span className="text-sm line-through text-text-muted">
-                  {formatPrice(product.originalPrice)}
-                </span>
-              )}
+      <div className={cn(
+        'relative w-full aspect-square rounded-2xl overflow-hidden',
+        'bg-background border border-border',
+        'shadow-lg shadow-accent/5',
+        'transition-all duration-500 ease-out',
+      )}>
+        {/* Product Image - Main Focus */}
+        <div className="relative w-full h-[75%] overflow-hidden">
+          <motion.img
+            src={product.image}
+            alt={product.title}
+            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            onLoad={() => setImageLoaded(true)}
+          />
+          {!imageLoaded && (
+            <div className="absolute inset-0 bg-background-alt flex items-center justify-center">
+              <div className="animate-pulse text-text-muted">Loading...</div>
             </div>
+          )}
+        </div>
+
+        {/* Product Info - Minimal, Clean */}
+        <div className="p-5 space-y-3">
+          <h3 className="font-semibold text-text-primary text-lg line-clamp-1 group-hover:text-accent transition-colors duration-300">
+            {product.title}
+          </h3>
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-bold text-text-primary">
+              {formatPrice(product.price)}
+            </span>
+            {product.originalPrice && product.originalPrice > product.price && (
+              <span className="text-sm line-through text-text-muted">
+                {formatPrice(product.originalPrice)}
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Back Face - Quick Actions */}
-        <div
-          className="absolute inset-0 backface-hidden w-full h-full flex flex-col items-center justify-center p-4 gap-4"
-          style={{
-            backfaceVisibility: 'hidden',
-            background: 'var(--color-background)',
-            transform: 'rotateY(180deg)',
-            borderRadius: '1rem',
-          }}
-        >
-          <div className="text-center w-full">
-            <p className="text-sm font-medium text-text-primary mb-1">Select Size</p>
-            <div className="flex flex-wrap justify-center gap-1.5">
-              {product.sizes.map((size) => (
-                <button
-                  key={size}
-                  className="px-3 py-1.5 text-xs font-medium rounded-xl border border-border text-text-secondary hover:border-accent hover:text-accent hover:bg-accent-light transition-all duration-200"
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="w-full space-y-2 pt-2 border-t border-border">
+        {/* Subtle WhatsApp CTA - Appears on Hover */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background/95 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-full group-hover:translate-y-0">
+          <div className="max-w-xs mx-auto">
             <Button
               variant="primary"
-              size="md"
+              size="sm"
               fullWidth
               onClick={handleWhatsAppOrder}
               icon={<WhatsAppIcon />}
               iconPosition="left"
             >
               DM to Order
-            </Button>
-            <Button
-              variant="outline"
-              size="md"
-              fullWidth
-              onClick={handleWhatsAppOrder}
-            >
-              Quick Add
             </Button>
           </div>
         </div>
